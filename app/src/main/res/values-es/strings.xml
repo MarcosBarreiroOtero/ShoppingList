@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ListaCompra</string>
+    <string name="toolbar_title">Lista de la Compra</string>
+    <string name="add_button">Añadir</string>
+    <string name="add_item_hint">Añadir objeto</string>
+
+    <string name="yes">Si</string>
+    <string name="no">No</string>
+    <string name="alert_clear_items_title">¿Vacíar lista de la compra?</string>
+</resources>

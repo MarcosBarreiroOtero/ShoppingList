@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ShoppingList</string>
+    <string name="toolbar_title">Shopping List</string>
+    <string name="add_button">Add</string>
+    <string name="add_item_hint">Add item</string>
+
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="alert_clear_items_title">Empty shopping list?</string>
+</resources>
