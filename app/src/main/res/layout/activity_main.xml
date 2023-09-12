@@ -19,7 +19,7 @@
         app:title="@string/toolbar_title"
         app:titleTextColor="@color/white" />
 
-    <android.support.v7.app.AlertController.RecycleListView
+    <ListView
         android:id="@+id/item_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
