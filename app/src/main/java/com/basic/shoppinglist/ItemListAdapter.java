@@ -57,8 +57,8 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         TextView itemNameView = convertView.findViewById(R.id.item_list_text);
         itemNameView.setText(item.getDescription());
 
-        TextView itemIdView = convertView.findViewById(R.id.item_list_id);
-        itemIdView.setText(String.valueOf(item.getId()));
+//        TextView itemIdView = convertView.findViewById(R.id.item_list_id);
+//        itemIdView.setText(String.valueOf(item.getId()));
 
         return convertView;
     }
