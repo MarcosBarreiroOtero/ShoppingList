@@ -5,14 +5,16 @@ import static android.view.View.OnClickListener;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
 import com.basic.shoppinglist.model.entity.Item;
@@ -23,7 +25,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     private ShoppingListDb db;
-    private ItemListAdapter adapter;
+    private RecyclerViewAdapter adapter;
 
 
     @Override
@@ -36,33 +38,54 @@ public class MainActivity extends AppCompatActivity {
         db = Room.databaseBuilder(getApplicationContext(),
                 ShoppingListDb.class, "database-name").allowMainThreadQueries().build();
 
-        final ArrayList<Item> allItems = new ArrayList<>(db.itemDao().getAll());
 
-
-        ListView listView = findViewById(R.id.item_list);
-        adapter = new ItemListAdapter(allItems, getApplicationContext());
-        listView.setAdapter(adapter);
-
-        listView.setOnItemClickListener(clickItemListListener(listView));
+        RecyclerView recyclerView = findViewById(R.id.item_list);
+        configureRecyclerView(recyclerView);
 
         TextInputLayout textInputLayout = findViewById(R.id.add_item_tex);
-        textInputLayout.setEndIconOnClickListener(addItemsEndIconListener(textInputLayout, listView));
+        textInputLayout.setEndIconOnClickListener(addItemsEndIconListener(textInputLayout, recyclerView));
 
     }
 
-    private AdapterView.OnItemClickListener clickItemListListener(ListView listView) {
-        return new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+    private void configureRecyclerView(RecyclerView recyclerView) {
+        final ArrayList<Item> allItems = new ArrayList<>(db.itemDao().getAll());
 
-                TextView itemIdView = view.findViewById(R.id.item_list_id);
-                db.itemDao().deleteById(Integer.parseInt(itemIdView.getText().toString()));
-                adapter.removeItemByPosition(i);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+
+        adapter = new RecyclerViewAdapter(allItems);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(linearLayoutManager);
+
+        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeItemListListener());
+        itemTouchhelper.attachToRecyclerView(recyclerView);
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), linearLayoutManager.getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
+    }
+
+    private ItemTouchHelper.Callback swipeItemListListener() {
+        return new ItemTouchHelper.Callback() {
+            @Override
+            public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                return makeMovementFlags(0, ItemTouchHelper.LEFT);
+            }
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                final int position = viewHolder.getAdapterPosition();
+                Item item = adapter.getDataSet().get(position);
+                db.itemDao().deleteById(item.getId());
+                adapter.removeItemByPosition(position);
             }
         };
     }
 
-    private OnClickListener addItemsEndIconListener(TextInputLayout textInputLayout, ListView listView) {
+    private OnClickListener addItemsEndIconListener(TextInputLayout textInputLayout, RecyclerView recyclerView) {
         return new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -82,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                     adapter.addItem(item);
 
                     //Focus on the last element of the list
-                    listView.setSelection(listView.getAdapter().getCount() - 1);
+                    recyclerView.smoothScrollToPosition(recyclerView.getAdapter().getItemCount() - 1);
 
                     //Clean input text
                     editText.getText().clear();
