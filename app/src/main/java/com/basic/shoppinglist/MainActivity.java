@@ -39,10 +39,8 @@ public class MainActivity extends AppCompatActivity {
                 ShoppingListDb.class, "database-name").allowMainThreadQueries().build();
 
 
-//        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
-//                linearLayoutManager.getOrientation());
-//        recyclerView.addItemDecoration(dividerItemDecoration);
         RecyclerView recyclerView = findViewById(R.id.item_list);
+        configureRecyclerView(recyclerView);
 
         TextInputLayout textInputLayout = findViewById(R.id.add_item_tex);
         textInputLayout.setEndIconOnClickListener(addItemsEndIconListener(textInputLayout, recyclerView));
@@ -87,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
-    private OnClickListener addItemsEndIconListener(TextInputLayout textInputLayout, RecyclerView listView) {
+    private OnClickListener addItemsEndIconListener(TextInputLayout textInputLayout, RecyclerView recyclerView) {
         return new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -107,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                     adapter.addItem(item);
 
                     //Focus on the last element of the list
-                    listView.smoothScrollToPosition(listView.getAdapter().getItemCount() - 1);
+                    recyclerView.smoothScrollToPosition(recyclerView.getAdapter().getItemCount() - 1);
 
                     //Clean input text
                     editText.getText().clear();
