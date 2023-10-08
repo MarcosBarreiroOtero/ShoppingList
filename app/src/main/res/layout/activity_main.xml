@@ -68,6 +68,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/add_item_tex"
         app:layout_constraintTop_toBottomOf="@+id/item_list"
-        app:srcCompat="@drawable/ic_action_name" />
+        app:srcCompat="@drawable/ic_action_name"
+        app:tint="?attr/colorPrimary"
+        style="?attr/materialButtonOutlinedStyle"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
