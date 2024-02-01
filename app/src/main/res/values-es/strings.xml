@@ -7,4 +7,7 @@
     <string name="yes">Si</string>
     <string name="no">No</string>
     <string name="alert_clear_items_title">¿Vacíar lista de la compra?</string>
+
+    <string name="deleted">Eliminado</string>
+    <string name="undo">Deshacer</string>
 </resources>

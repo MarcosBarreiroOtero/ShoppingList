@@ -7,4 +7,7 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="alert_clear_items_title">Empty shopping list?</string>
+
+    <string name="deleted">Deleted</string>
+    <string name="undo">Undo</string>
 </resources>
