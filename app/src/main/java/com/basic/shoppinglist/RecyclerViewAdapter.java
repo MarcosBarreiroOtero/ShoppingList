@@ -52,6 +52,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<ItemViewHolder> {
         this.notifyItemRemoved(position);
     }
 
+    public void restoreItem(int position, Item item) {
+        dataSet.add(position, item);
+        this.notifyItemInserted(position);
+    }
+
     public ArrayList<Item> getDataSet() {
         return dataSet;
     }

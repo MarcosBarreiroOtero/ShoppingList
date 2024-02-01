@@ -3,6 +3,7 @@ package com.basic.shoppinglist;
 import static android.view.View.OnClickListener;
 
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
 import com.basic.shoppinglist.model.entity.Item;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
@@ -26,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ShoppingListDb db;
     private RecyclerViewAdapter adapter;
+    private ConstraintLayout constraintLayout;
 
 
     @Override
@@ -34,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
+
+        constraintLayout = findViewById(R.id.main_constraint_layout);
 
         db = Room.databaseBuilder(getApplicationContext(),
                 ShoppingListDb.class, "database-name").allowMainThreadQueries().build();
@@ -59,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeItemListListener());
         itemTouchhelper.attachToRecyclerView(recyclerView);
 
+
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), linearLayoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
     }
@@ -67,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         return new ItemTouchHelper.Callback() {
             @Override
             public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-                return makeMovementFlags(0, ItemTouchHelper.LEFT);
+                return makeMovementFlags(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
             }
 
             @Override
@@ -81,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
                 Item item = adapter.getDataSet().get(position);
                 db.itemDao().deleteById(item.getId());
                 adapter.removeItemByPosition(position);
+
+                showSnackbarToRestoreItem(item, position);
             }
         };
     }
@@ -95,13 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 String newItemDescription = editText.getText().toString();
 
                 if (!"".equals(newItemDescription)) {
-                    Item item = new Item();
-                    item.setDescription(newItemDescription);
-                    item.setState(1);
-
-                    long newItemId = db.itemDao().insert(item);
-                    item.setId((int) newItemId);
-
+                    Item item = insertItem(newItemDescription, 1);
                     adapter.addItem(item);
 
                     //Focus on the last element of the list
@@ -133,5 +136,30 @@ public class MainActivity extends AppCompatActivity {
                 .create();
 
         alert.show();
+    }
+
+    private void showSnackbarToRestoreItem(Item item, int position) {
+        Snackbar snackbar = Snackbar.make(constraintLayout, getString(R.string.deleted) + " " + item.getDescription(), Snackbar.LENGTH_SHORT);
+        snackbar.setAction(getString(R.string.undo), new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Item restoredItem = insertItem(item.getDescription(), item.getState());
+                adapter.restoreItem(position, restoredItem);
+            }
+        });
+
+        snackbar.setActionTextColor(Color.YELLOW);
+        snackbar.show();
+    }
+
+    private Item insertItem(String description, int state) {
+        Item item = new Item();
+        item.setDescription(description);
+        item.setState(state);
+
+        long newItemId = db.itemDao().insert(item);
+        item.setId((int) newItemId);
+
+        return item;
     }
 }
